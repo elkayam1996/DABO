@@ -1,6 +1,8 @@
 import subprocess
+from pathlib import Path
+
 def run_python(path: str) -> dict:
-    file_path = safe_path(path)
+    file_path = Path(path).expanduser().resolve()
 
     if not file_path.exists():
         return {"ok": False, "error": "Python file does not exist."}

@@ -1,18 +1,14 @@
 from pathlib import Path
 
-WORKSPACE_ROOT = Path.cwd()
-
 
 def safe_path(path: str) -> Path:
     """
-    Makes sure the tool only touches files inside the project folder.
+    Converts a string path into a real full path.
+
+    This version does NOT limit access to the current project folder.
+    Later you can add permission limits here.
     """
-    full_path = (WORKSPACE_ROOT / path).resolve()
-
-    if not str(full_path).startswith(str(WORKSPACE_ROOT.resolve())):
-        raise ValueError("Access outside workspace is not allowed.")
-
-    return full_path
+    return Path(path).expanduser().resolve()
 
 
 def list_dir(path: str = ".") -> dict:
@@ -30,6 +26,7 @@ def list_dir(path: str = ".") -> dict:
         items.append({
             "name": item.name,
             "type": "dir" if item.is_dir() else "file",
+            "path": str(item),
         })
 
     return {"ok": True, "items": items}
@@ -64,6 +61,9 @@ def edit_file(path: str, old_text: str, new_text: str) -> dict:
     if not file_path.exists():
         return {"ok": False, "error": "File does not exist."}
 
+    if not file_path.is_file():
+        return {"ok": False, "error": "Path is not a file."}
+
     content = file_path.read_text(encoding="utf-8")
 
     if old_text not in content:
@@ -76,19 +76,13 @@ def edit_file(path: str, old_text: str, new_text: str) -> dict:
 
 
 def apply_patch(path: str, replacements: list[dict[str, str]]) -> dict:
-    """
-    Simple safe patch tool.
-
-    replacements example:
-    [
-        {"old": "bad code", "new": "fixed code"},
-        {"old": "wrong import", "new": "right import"}
-    ]
-    """
     file_path = safe_path(path)
 
     if not file_path.exists():
         return {"ok": False, "error": "File does not exist."}
+
+    if not file_path.is_file():
+        return {"ok": False, "error": "Path is not a file."}
 
     content = file_path.read_text(encoding="utf-8")
 
@@ -107,11 +101,6 @@ def apply_patch(path: str, replacements: list[dict[str, str]]) -> dict:
     file_path.write_text(content, encoding="utf-8")
 
     return {"ok": True, "path": str(file_path)}
-
-
-
-
-
 
 
 def ask_user_approval(action: str) -> dict:
