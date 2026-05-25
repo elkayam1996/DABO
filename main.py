@@ -1,10 +1,7 @@
-from openai import OpenAI
-
 from context import Context
 from modelConnection import LocalModelFactory, CloudModelFactory
 from primitiveTools import ToolRegistry
 from plan import Plan
-from enums import *
 import consts
 
 
