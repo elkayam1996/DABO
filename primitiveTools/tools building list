@@ -1,14 +1,14 @@
 Layer 1: Safe Core Tools
 
-list_dir
-read_file
-write_file
-edit_file
-apply_patch
-run_python
-web_search
-web_fetch
-ask_user_approval
+list_dir -V
+read_file -V
+write_file -V
+edit_file -V
+apply_patch -V
+run_python -V
+web_search -V
+web_fetch -
+ask_user_approval -V
 
 
 Layer 2: Dangerous / Advanced Tools
