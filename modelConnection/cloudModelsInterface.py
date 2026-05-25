@@ -1,5 +1,5 @@
 from openai import OpenAI
-from enums import REASONING
+from enum import Enum
 from .utils import get_or_save_api_key
 import consts
 
@@ -7,21 +7,33 @@ import consts
 class OpenAIConnection:
     """connection into OpenAI services"""
 
+    class REASONING(Enum):
+        """reasoning type for OpenAI models"""
+        NONE = "none"
+        MINIMAL = "minimal"
+        LOW = "low"
+        MEDIUM = "medium"
+        HIGH = "high"
+        XHIGH = "xhigh"
+
     def __init__(self):
         api_key = get_or_save_api_key(consts.OPENAI_KEY)
         self.client = OpenAI(api_key=api_key)
         self.model_name = input("Model Name: ")
 
-    def chat(self, input: list[dict[str, str]], reasoning: REASONING = REASONING.NONE, tools=None) -> str:
+    def chat(self, input: list[dict[str, str]], reasoning=None, tools=None) -> str:
+        if reasoning is None:
+            reasoning = self.REASONING.NONE
+
         kwargs = {
             "model": self.model_name,
             "input": input,
         }
 
-        # Only send reasoning when needed.
-        # Some OpenAI models do not accept reasoning.
-        if reasoning != REASONING.NONE:
-            kwargs["reasoning"] = {"effort": reasoning.value}
+        if reasoning != self.REASONING.NONE:
+            kwargs["reasoning"] = {
+                "effort": reasoning.value
+            }
 
         if tools is not None:
             kwargs["tools"] = tools
