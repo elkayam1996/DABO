@@ -11,8 +11,8 @@ class LocalModelConnection:
             print(model['model'])
         self.model_name = input("Model Name: ")
 
-    def chat(self, inp: str):
-        response = ollama.chat(model=self.model_name, input=[inp, ])
+    def chat(self, message: list[dict[str, str]]) -> str:
+        response = ollama.chat(model=self.model_name, message=message)
         return response['message']['content']
 
 
